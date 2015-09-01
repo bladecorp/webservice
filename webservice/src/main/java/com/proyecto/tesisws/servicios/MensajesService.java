@@ -148,7 +148,8 @@ public class MensajesService{
 			List<String> listaTelefonosEnvio = new ArrayList<String>();
 			List<Destinatarios> destinatarios = destinatarioService.obtenerDestinatariosPorIdVehiculo(vehiculo.getId());
 			listaTelefonosEnvio = armarListaTelefonos(telefonos, destinatarios);
-			String mensajeBase = "Se detectó actividad en el sensor de "+sensor.getSensor();
+			String mensajeBase = "Se detectó actividad en el sensor de "+sensor.getSensor()+". Se envía alarma a: ";
+			for(String t : listaTelefonosEnvio){mensajeBase += t+"; ";}
 			String mensajeSMS = mensajeCrudo+";"+vehiculo.getId();
 			
 			try {
@@ -158,7 +159,9 @@ public class MensajesService{
 				}
 			} catch (Exception e) {
 				try {
-					enviarMensaje(listaTelefonosEnvio, mensajeSMS);
+					if(vehiculo.getIdTipoStatus() == TipoStatus.ACTIVADO.getId()){
+						enviarMensaje(listaTelefonosEnvio, mensajeSMS);	
+					}
 				} catch (TwilioRestException ex) {
 						logger.error("Error al enviar los mensajes SMS: "+ex.getMessage());
 				}
